@@ -6,7 +6,7 @@ client = OpenAI(api_key=st.secrets["API_key"])
 
 def app():
     st.title("MTRN3500 Study Buddy")
-    st.subheader("This Chatbot is in the development stage and can therefore make mistakes! Please check all important info with tutors to ensure accuracy.")
+    st.write("This Chatbot is in the development stage and can therefore make mistakes! Please check all important info with tutors to ensure accuracy.")
 
     if "messages" not in st.session_state:
         st.session_state.client = client
