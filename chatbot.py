@@ -4,19 +4,9 @@ import time
 
 client = OpenAI(api_key=st.secrets["API_key"])
 
-# vector_store = client.beta.vector_stores.create(name="Chatbot Training")
-
-# file_paths = ["files/CO.pdf", "files/Jays-Notes.pdf"]
-# file_streams = [open(path, "rb") for path in file_paths]
- 
-# # Use the upload and poll SDK helper to upload the files, add them to the vector store,
-# # and poll the status of the file batch for completion.
-# batch = client.beta.vector_stores.file_batches.upload_and_poll(
-#     vector_store_id=vector_store.id, files=file_streams
-# )
-
 def app():
     st.title("MTRN3500 Study Buddy")
+    st.subheader("This Chatbot is in the development stage and can therefore make mistakes! Please check all important info with tutors to ensure accuracy.")
 
     if "messages" not in st.session_state:
         st.session_state.client = client
