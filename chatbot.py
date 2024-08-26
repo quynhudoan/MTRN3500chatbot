@@ -7,7 +7,7 @@ client = OpenAI(api_key=st.secrets["API_key"])
 def app():
     st.title("MTRN3500 Study Buddy")
 
-    if "messages" not in st.session_state:
+    if "client" not in st.session_state:
         st.session_state.client = client
 
         st.session_state.assistant = st.session_state.client.beta.assistants.create(
