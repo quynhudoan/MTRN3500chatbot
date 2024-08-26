@@ -36,24 +36,49 @@ def app():
             instructions="Please address the user as a UNSW student"
         )
 
-        run_status = st.session_state.client.beta.threads.runs.retrieve(
-            thread_id=st.session_state.thread.id,
-            run_id=run.id
-        )
+        while True:
+            time.sleep(1)
 
-        # If run is completed, get messages
-        if run_status.status == 'completed':
-            messages = st.session_state.client.beta.threads.messages.list(
-                thread_id=st.session_state.thread.id
+            # Retrieve the run status
+            run_status = st.session_state.client.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread.id,
+                run_id=run.id
             )
 
-            for msg in messages.data:
-                role = msg.role
-                content = msg.content[0].text.value
-                st.write(f"{role.capitalize()}: {content}")
+            # If run is completed, get messages
+            if run_status.status == 'completed':
+                messages = st.session_state.client.beta.threads.messages.list(
+                    thread_id=st.session_state.thread.id
+                )
 
-                # st.session_state.messages.append({"role": "user", "content": user_query})
-                st.chat_message(role).write(content)
+                # Loop through messages and print content based on role
+                for msg in messages.data:
+                    role = msg.role
+                    content = msg.content[0].text.value
+                    st.write(f"{role.capitalize()}: {content}")
+                break
+            else:
+                st.write("Waiting for the Assistant to process...")
+                time.sleep(1)
+
+        # run_status = st.session_state.client.beta.threads.runs.retrieve(
+        #     thread_id=st.session_state.thread.id,
+        #     run_id=run.id
+        # )
+
+        # # If run is completed, get messages
+        # if run_status.status == 'completed':
+        #     messages = st.session_state.client.beta.threads.messages.list(
+        #         thread_id=st.session_state.thread.id
+        #     )
+
+        #     for msg in messages.data:
+        #         role = msg.role
+        #         content = msg.content[0].text.value
+        #         st.write(f"{role.capitalize()}: {content}")
+
+        #         # st.session_state.messages.append({"role": "user", "content": user_query})
+        #         st.chat_message(role).write(content)
                 # response = client.chat.completions.create(model="gpt-4o", messages=st.session_state.messages)
                 # msg = response.choices[0].message.content
                 # st.session_state.messages.append({"role": "assistant", "content": msg.content[0].text.value})
