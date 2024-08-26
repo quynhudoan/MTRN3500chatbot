@@ -1,12 +1,18 @@
 from openai import OpenAI
 import streamlit as st
 import time
+from PIL import Image
 
 client = OpenAI(api_key=st.secrets["API_key"])
 
 def app():
+    img = Image.open("logo.png")
+    new_size = (150, 150)
+    img = img.resize(new_size)
+    st.image(img)
+
     st.title("MTRN3500 Study Buddy")
-    st.write("This Chatbot is in the development stage and can therefore make mistakes! Please check all important info with tutors to ensure accuracy.")
+    st.write("This Chatbot is in the development stage and can therefore make mistakes! Please check all important information with tutors to ensure accuracy.")
 
     if "messages" not in st.session_state:
         st.session_state.client = client
@@ -14,7 +20,7 @@ def app():
         # create an Assistant
         st.session_state.assistant = st.session_state.client.beta.assistants.create(
             name="MTRN3500 Study Buddy",
-            instructions="This GPT, named 'MTRN3500 Study Buddy,' will answer course-specific questions about the undergraduate UNSW course MTRN3500. It will not answer any questions outside of this course or related to mechatronics. The tone of the responses will always be friendly, kind, supportive, and welcoming, while also being engaging and encouraging. It will help students feel confident and motivated in their learning journey. The responses will be detailed, yet easy to understand, guiding students through the complexities of the course material with patience, clarity, and always with a friendly, reassuring approach. All responses should be engaging, kind, friendly and very welcoming, focusing on supporting the student's wellbeing. The GPT will ensure its responses are as accurate as possible to give precise and reliable information related to the course.",
+            instructions="This GPT, named 'MTRN3500 Study Buddy,' will answer course-specific questions about the undergraduate UNSW course MTRN3500. It will not answer any questions outside of this course or not related to mechatronics. The tone of the responses will always be friendly, kind, supportive, and welcoming, while also being engaging and encouraging. It will help students feel confident and motivated in their learning journey. The responses will be detailed, yet easy to understand, guiding students through the complexities of the course material with patience, clarity, and always with a friendly, reassuring approach. All responses should be engaging, kind, friendly and very welcoming, focusing on supporting the student's wellbeing. The GPT will ensure its responses are as accurate as possible to give precise and reliable information related to the course.",
             model="gpt-4o",
             tools=[{"type": "file_search"}],
             tool_resources={"file_search": {"vector_store_ids": ["vs_Aw3U3CKAXOpMbS1lUQ454iBC"]}},
