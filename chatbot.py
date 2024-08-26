@@ -2,7 +2,7 @@ from openai import OpenAI
 import streamlit as st
 
 # openai.api_key = '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'
-client = OpenAI(api_key='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')
+client = OpenAI(api_key=st.secrets["API_key"])
 
 # def get_reply(input_string):
 #     response = client.chat.completion.create(
