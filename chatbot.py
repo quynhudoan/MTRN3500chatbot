@@ -34,9 +34,9 @@ def app():
         st.session_state.assistant = st.session_state.client.beta.assistants.create(
             name="Customer Service Assistant",
             instructions="You are a customer support chatbot. Use your knowledge base to best respond to customer queries.",
-            model="gpt-4-1106-preview",
+            model="gpt-4o",
             # file_ids=[st.session_state.file.id],
-            tools=[{"type": "retrieval"}]
+            # tools=[{"type": "retrieval"}]
         )
 
         # Step 2: Create a Thread
