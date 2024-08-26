@@ -7,7 +7,7 @@ client = OpenAI(api_key=st.secrets["API_key"])
 
 def app():
     img = Image.open("logo.png")
-    new_size = (150, 75)
+    new_size = (150, 60)
     img = img.resize(new_size)
     st.image(img)
 
