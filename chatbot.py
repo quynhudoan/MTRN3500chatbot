@@ -48,16 +48,16 @@ def app():
             )
 
             for msg in messages.data:
-                # role = msg.role
-                # content = msg.content[0].text.value
-                # st.write(f"{role.capitalize()}: {content}")
+                role = msg.role
+                content = msg.content[0].text.value
+                st.write(f"{role.capitalize()}: {content}")
 
-                st.session_state.messages.append({"role": "user", "content": user_query})
-                st.chat_message("user").write(user_query)
+                # st.session_state.messages.append({"role": "user", "content": user_query})
+                # st.chat_message("user").write(user_query)
                 # response = client.chat.completions.create(model="gpt-4o", messages=st.session_state.messages)
                 # msg = response.choices[0].message.content
-                st.session_state.messages.append({"role": "assistant", "content": msg.content[0].text.value})
-                st.chat_message("assistant").write(msg.content[0].text.value)
+                # st.session_state.messages.append({"role": "assistant", "content": msg.content[0].text.value})
+                # st.chat_message("assistant").write(msg.content[0].text.value)
 
     # if 'client' not in st.session_state:
     #     st.session_state.client = OpenAI(api_key=st.secrets["API_key"])
