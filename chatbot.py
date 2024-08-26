@@ -53,7 +53,7 @@ def app():
                 st.write(f"{role.capitalize()}: {content}")
 
                 # st.session_state.messages.append({"role": "user", "content": user_query})
-                # st.chat_message("user").write(user_query)
+                st.chat_message(role).write(content)
                 # response = client.chat.completions.create(model="gpt-4o", messages=st.session_state.messages)
                 # msg = response.choices[0].message.content
                 # st.session_state.messages.append({"role": "assistant", "content": msg.content[0].text.value})
