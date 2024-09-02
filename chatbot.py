@@ -54,10 +54,6 @@ def app():
     st.title("MTRN3500 Study Buddy")
     st.write("This Chatbot is in the development stage and can therefore make mistakes! Please check all important information with tutors to ensure accuracy.")
 
-    if st.button('Authenticate'):
-        service = authenticate_gdrive()
-        st.success("Authenticated successfully!")
-
     if "messages" not in st.session_state:
         st.session_state.client = client
 
@@ -111,8 +107,8 @@ def app():
 
         api_data = {
             'timestamp': datetime.now(),
-            'prompt': prompt,
-            'response': msg
+            'prompt': str(prompt),
+            'response': str(msg)
         }
 
         json_data = json.dumps(api_data, indent=4)
