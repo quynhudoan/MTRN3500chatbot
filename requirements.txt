@@ -1,4 +1,3 @@
 openai
 streamlit
-libpq-dev
-psycopg2
+psycopg2-binary
