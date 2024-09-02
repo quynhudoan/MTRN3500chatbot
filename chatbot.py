@@ -5,23 +5,45 @@ from PIL import Image
 from datetime import datetime
 import json
 import os
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 client = OpenAI(api_key=st.secrets["API_key"])
 
-# file path to the JSON file
-file_path = os.chdir(str('/Users/quynhnhudoan/Desktop/thesisB/data/api_logs.json'))
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
-def append_to_json_file(file_path, new_data):
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as json_file:
-            data = json.load(json_file)
+# Function to authenticate and get Google Drive service
+def authenticate_gdrive():
+    creds = None
+
+    # Check if we have token.json file (token storage file)
+    if 'token' not in st.session_state:
+        # Load the credentials.json file
+        creds = InstalledAppFlow.from_client_secrets_file(
+            'credentials.json', SCOPES).run_local_server(port=0)
+        # Save the credentials for future runs
+        st.session_state['token'] = creds.to_json()
     else:
-        data = []
+        creds = Credentials.from_authorized_user_info(st.session_state['token'])
 
-    data.append(new_data)
+    # Create a Google Drive service
+    service = build('drive', 'v3', credentials=creds)
+    return service
 
-    with open(file_path, 'w') as json_file:
-        json.dump(data, json_file, indent=4)
+def upload_file_to_gdrive(service, file_name):
+    # Define the file metadata
+    file_metadata = {
+        'name': file_name,
+        'mimeType': 'application/json'
+    }
+    
+    # Upload the file
+    media = MediaFileUpload(file_name, mimetype='application/json')
+    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+
+    st.success(f"File uploaded successfully with file ID: {file.get('id')}")
 
 def app():
     img = Image.open("logo.png")
@@ -31,6 +53,10 @@ def app():
 
     st.title("MTRN3500 Study Buddy")
     st.write("This Chatbot is in the development stage and can therefore make mistakes! Please check all important information with tutors to ensure accuracy.")
+
+    if st.button('Authenticate'):
+        service = authenticate_gdrive()
+        st.success("Authenticated successfully!")
 
     if "messages" not in st.session_state:
         st.session_state.client = client
@@ -89,7 +115,16 @@ def app():
             'response': msg
         }
 
-        append_to_json_file(file_path, api_data)
+        json_data = json.dumps(api_data, indent=4)
+        file_name = 'api_logs.json'
+
+        with open(file_name, 'w') as json_file:
+            json_file.write(json_data)
+
+        if 'token' in st.session_state:
+            service = authenticate_gdrive()
+            upload_file_to_gdrive(service, file_name)
+
 
 if __name__ == "__main__":
     app()
