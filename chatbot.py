@@ -2,8 +2,18 @@ from openai import OpenAI
 import streamlit as st
 import time
 from PIL import Image
+import psycopg2
+from datetime import datetime
 
 client = OpenAI(api_key=st.secrets["API_key"])
+
+db_params = {
+    'dbname': 'MTRN3500_chatbot',
+    'user': 'postgres',
+    'password': 'Thienan40',
+    'host': 'localhost',  # or your PostgreSQL server IP
+    'port': '5432'
+}
 
 def app():
     img = Image.open("logo.png")
@@ -64,6 +74,33 @@ def app():
         msg = messages.data[0].content[0].text.value
         st.session_state.messages.append({"role": "assistant", "content": msg})
         st.chat_message("assistant").write(msg)
+
+        api_data = {
+            'timestamp': datetime.now(),
+            'prompt': prompt,
+            'response': msg
+        }
+
+        # Connect to the PostgreSQL database
+        conn = psycopg2.connect(**db_params)
+        cursor = conn.cursor()
+
+        # SQL query to insert data into the table
+        insert_query = """
+        INSERT INTO api_logs (timestamp, prompt, response)
+        VALUES (%s, %s, %s);
+        """
+
+        data_to_insert = (
+            api_data['timestamp'],
+            api_data['prompt'],
+            api_data['response']
+        )
+
+        cursor.execute(insert_query, data_to_insert)
+        conn.commit()
+        cursor.close()
+        conn.close()
 
 if __name__ == "__main__":
     app()
