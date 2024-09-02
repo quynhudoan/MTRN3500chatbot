@@ -9,22 +9,17 @@ import os
 client = OpenAI(api_key=st.secrets["API_key"])
 
 # file path to the JSON file
-file_path = '/Users/quynhnhudoan/Desktop/thesisB/data/api_logs.json'
+file_path = os.chdir(str('/Users/quynhnhudoan/Desktop/thesisB/data/api_logs.json'))
 
 def append_to_json_file(file_path, new_data):
-    # Check if the file exists
     if os.path.exists(file_path):
-        # Read the existing data
         with open(file_path, 'r') as json_file:
             data = json.load(json_file)
     else:
-        # If the file doesn't exist, initialize an empty list
         data = []
 
-    # Append the new data
     data.append(new_data)
 
-    # Write the updated data back to the file
     with open(file_path, 'w') as json_file:
         json.dump(data, json_file, indent=4)
 
