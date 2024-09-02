@@ -2,18 +2,31 @@ from openai import OpenAI
 import streamlit as st
 import time
 from PIL import Image
-import psycopg2
 from datetime import datetime
+import json
+import os
 
 client = OpenAI(api_key=st.secrets["API_key"])
 
-db_params = {
-    'dbname': 'MTRN3500_chatbot',
-    'user': 'postgres',
-    'password': 'Thienan40',
-    'host': 'localhost',  # or your PostgreSQL server IP
-    'port': '5432'
-}
+# file path to the JSON file
+file_path = '/Users/quynhnhudoan/Desktop/thesisB/data/api_logs.json'
+
+def append_to_json_file(file_path, new_data):
+    # Check if the file exists
+    if os.path.exists(file_path):
+        # Read the existing data
+        with open(file_path, 'r') as json_file:
+            data = json.load(json_file)
+    else:
+        # If the file doesn't exist, initialize an empty list
+        data = []
+
+    # Append the new data
+    data.append(new_data)
+
+    # Write the updated data back to the file
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
 
 def app():
     img = Image.open("logo.png")
@@ -81,26 +94,7 @@ def app():
             'response': msg
         }
 
-        # Connect to the PostgreSQL database
-        conn = psycopg2.connect(**db_params)
-        cursor = conn.cursor()
-
-        # SQL query to insert data into the table
-        insert_query = """
-        INSERT INTO api_logs (timestamp, prompt, response)
-        VALUES (%s, %s, %s);
-        """
-
-        data_to_insert = (
-            api_data['timestamp'],
-            api_data['prompt'],
-            api_data['response']
-        )
-
-        cursor.execute(insert_query, data_to_insert)
-        conn.commit()
-        cursor.close()
-        conn.close()
+        append_to_json_file(file_path, api_data)
 
 if __name__ == "__main__":
     app()
