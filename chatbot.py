@@ -90,7 +90,7 @@ def find_file(service, file_name):
 def share_file_with_user(service, file_id):
     permission = {
         'type': 'user',
-        'role': 'reader',
+        'role': 'writer',
         'emailAddress': 'quynhd2001@gmail.com'
     }
     
