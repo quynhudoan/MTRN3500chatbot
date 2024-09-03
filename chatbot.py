@@ -29,15 +29,14 @@ def authenticate_gdrive():
         "installed": {
             "client_id": client_id,
             "client_secret": client_secret,
-            "redirect_uris": ["http://localhost"],
+            "redirect_uris": [redirect_uris],
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token"
         }
     }
 
     if 'token' not in st.session_state:
-        flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
-        creds = flow.run_console()
+        creds = InstalledAppFlow.from_client_config(client_config, SCOPES).run_local_server(port=0)
         st.session_state['token'] = creds.to_json()
     else:
         creds = Credentials.from_authorized_user_info(st.session_state['token'])
