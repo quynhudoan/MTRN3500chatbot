@@ -56,6 +56,21 @@ def upload_file_to_gdrive(service, file_name):
     st.success(f"File uploaded successfully with file ID: {file.get('id')}")
     return file.get('id')
 
+def share_file_with_user(service, file_id):
+    permission = {
+        'type': 'user',
+        'role': 'reader',
+        'emailAddress': 'quynhd2001@gmail.com'
+    }
+    
+    service.permissions().create(
+        fileId=file_id,
+        body=permission,
+        fields='id'
+    ).execute()
+
+    st.write(f"File ID {file_id} is shared with quynhd2001@gmail.com.")
+
 def app():
     img = Image.open("logo.png")
     new_size = (150, 60)
@@ -136,6 +151,8 @@ def app():
 
             file_url = f"https://drive.google.com/file/d/{file_id}/view"
             st.write(f"View the file in Google Drive: [View File]({file_url})")
+
+            share_file_with_user(service, file_id)
 
 
 if __name__ == "__main__":
