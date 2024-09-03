@@ -36,7 +36,7 @@ def authenticate_gdrive():
     }
 
     if 'token' not in st.session_state:
-        creds = InstalledAppFlow.from_client_secrets_file(client_config, SCOPES).run_local_server(port=0)
+        creds = InstalledAppFlow.from_client_config(client_config, SCOPES).run_local_server(port=0)
         st.session_state['token'] = creds.to_json()
     else:
         creds = Credentials.from_authorized_user_info(st.session_state['token'])
