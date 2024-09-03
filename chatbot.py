@@ -4,13 +4,14 @@ import time
 from PIL import Image
 from datetime import datetime
 import json
-import os
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+import io
 
 client = OpenAI(api_key=st.secrets["API_key"])
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
@@ -43,18 +44,48 @@ def authenticate_gdrive():
     service = build('drive', 'v3', credentials=creds)
     return service
 
-def upload_file_to_gdrive(service, file_name):
-    file_metadata = {
-        'name': file_name,
-        'mimeType': 'application/json'
-    }
+def upload_or_append_file(service, file_name, new_data):
+    file_id = find_file(service, file_name)
     
-    # Upload the file
-    media = MediaFileUpload(file_name, mimetype='application/json')
-    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    if file_id:
+        existing_content = download_file_content(service, file_id)
+        updated_content = append_to_file_content(existing_content, new_data)
+        update_file_content(service, file_id, updated_content)
+        st.success(f"File '{file_name}' updated successfully.")
+        return file_id
+    else:
+        file_metadata = {
+            'name': file_name,
+            'mimeType': 'application/json'
+        }
+        media = MediaFileUpload(file_name, mimetype='application/json')
+        file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        st.success(f"File '{file_name}' uploaded successfully with file ID: {file.get('id')}")
+        return file.get('id')
 
-    st.success(f"File uploaded successfully with file ID: {file.get('id')}")
-    return file.get('id')
+def download_file_content(service, file_id):
+    request = service.files().get_media(fileId=file_id)
+    file_content = request.execute()
+
+    return file_content.decode('utf-8')
+
+def append_to_file_content(existing_content, new_data):
+    updated_content = existing_content + "\n" + new_data
+    return updated_content
+
+def update_file_content(service, file_id, updated_content):
+    file_stream = io.BytesIO(updated_content.encode('utf-8'))
+    media_body = MediaIoBaseUpload(file_stream, mimetype='text/plain')
+    service.files().update(fileId=file_id, media_body=media_body).execute()
+
+def find_file(service, file_name):
+    results = service.files().list(q=f"name='{file_name}' and trashed=false", fields="files(id, name)").execute()
+    files = results.get('files', [])
+    
+    if files:
+        return files[0]['id']
+    else:
+        return None
 
 def share_file_with_user(service, file_id):
     permission = {
@@ -147,7 +178,7 @@ def app():
 
         if 'token' in st.session_state:
             service = authenticate_gdrive()
-            file_id = upload_file_to_gdrive(service, file_name)
+            file_id = upload_or_append_file(service, file_name, json_data)
 
             file_url = f"https://drive.google.com/file/d/{file_id}/view"
             st.write(f"View the file in Google Drive: [View File]({file_url})")
