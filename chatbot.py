@@ -27,11 +27,11 @@ def authenticate_gdrive():
 
     client_config = {
         "installed": {
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uris": [redirect_uris],
-            "auth_uri": auth_uri,
-            "token_uri": token_uri
+            "client_id": str(client_id),
+            "client_secret": str(client_secret),
+            "redirect_uris": [str(redirect_uris)],
+            "auth_uri": str(auth_uri),
+            "token_uri": str(token_uri)
         }
     }
 
