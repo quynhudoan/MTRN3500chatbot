@@ -11,29 +11,41 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 client = OpenAI(api_key=st.secrets["API_key"])
-
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 # Function to authenticate and get Google Drive service
 def authenticate_gdrive():
     creds = None
 
-    # Check if we have token.json file (token storage file)
+    client_id = st.secrets["client_id"]
+    project_id = st.secrets["project_id"]
+    auth_uri = st.secrets["auth_uri"]
+    token_uri = st.secrets["token_uri"]
+    auth_provider_x509_cert_url = st.secrets["auth_provider_x509_cert_url"]
+    client_secret = st.secrets["client_secret"]
+    redirect_uris = st.secrets["redirect_uris"]
+
+    client_config = {
+        "installed": {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uris": [redirect_uris],
+            "auth_uri": auth_uri,
+            "token_uri": token_uri
+        }
+    }
+
     if 'token' not in st.session_state:
-        # Load the credentials.json file
-        creds = InstalledAppFlow.from_client_secrets_file(
-            'credentials.json', SCOPES).run_local_server(port=0)
-        # Save the credentials for future runs
+        creds = InstalledAppFlow.from_client_secrets_file(client_config, SCOPES).run_local_server(port=0)
         st.session_state['token'] = creds.to_json()
     else:
         creds = Credentials.from_authorized_user_info(st.session_state['token'])
 
-    # Create a Google Drive service
+    # create a Google Drive service
     service = build('drive', 'v3', credentials=creds)
     return service
 
 def upload_file_to_gdrive(service, file_name):
-    # Define the file metadata
     file_metadata = {
         'name': file_name,
         'mimeType': 'application/json'
@@ -53,6 +65,8 @@ def app():
 
     st.title("MTRN3500 Study Buddy")
     st.write("This Chatbot is in the development stage and can therefore make mistakes! Please check all important information with tutors to ensure accuracy.")
+
+    authenticate_gdrive()
 
     if "messages" not in st.session_state:
         st.session_state.client = client
