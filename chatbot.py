@@ -33,11 +33,11 @@ def authenticate_gdrive():
         "universe_domain": st.secrets["gcp_service_account"]["universe_domain"]
     }
 
-    if 'token' not in st.session_state:
-        creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
-        st.session_state['token'] = creds
-    else:
-        creds = Credentials.from_authorized_user_info(st.session_state['token'])
+    # if 'token' not in st.session_state:
+    creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
+    st.session_state['token'] = creds
+    # else:
+        # creds = Credentials.from_authorized_user_info(st.session_state['token'])
 
     # create a Google Drive service
     service = build('drive', 'v3', credentials=creds)
