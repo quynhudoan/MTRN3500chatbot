@@ -111,7 +111,7 @@ def app():
             'response': str(msg)
         }
 
-        json_data = json.dumps(api_data, indent=4)
+        json_data = json.dumps(api_data, indent=4, default = str)
         file_name = 'api_logs.json'
 
         with open(file_name, 'w') as json_file:
