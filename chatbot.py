@@ -9,6 +9,8 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
 
 client = OpenAI(api_key=st.secrets["API_key"])
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
@@ -17,26 +19,10 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file']
 def authenticate_gdrive():
     creds = None
 
-    client_id = st.secrets["client_id"]
-    project_id = st.secrets["project_id"]
-    auth_uri = st.secrets["auth_uri"]
-    token_uri = st.secrets["token_uri"]
-    auth_provider_x509_cert_url = st.secrets["auth_provider_x509_cert_url"]
-    client_secret = st.secrets["client_secret"]
-    redirect_uris = st.secrets["redirect_uris"]
-
-    client_config = {
-        "installed": {
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uris": [redirect_uris],
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token"
-        }
-    }
+    service_account_info = json.loads(st.secrets["gcp_service_account"].to_json())
 
     if 'token' not in st.session_state:
-        creds = InstalledAppFlow.from_client_config(client_config, SCOPES).run_local_server(port=0)
+        creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
         st.session_state['token'] = creds.to_json()
     else:
         creds = Credentials.from_authorized_user_info(st.session_state['token'])
