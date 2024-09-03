@@ -54,6 +54,7 @@ def upload_file_to_gdrive(service, file_name):
     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
     st.success(f"File uploaded successfully with file ID: {file.get('id')}")
+    return file.get('id')
 
 def app():
     img = Image.open("logo.png")
@@ -131,7 +132,10 @@ def app():
 
         if 'token' in st.session_state:
             service = authenticate_gdrive()
-            upload_file_to_gdrive(service, file_name)
+            file_id = upload_file_to_gdrive(service, file_name)
+
+            file_url = f"https://drive.google.com/file/d/{file_id}/view"
+            st.write(f"View the file in Google Drive: [View File]({file_url})")
 
 
 if __name__ == "__main__":
