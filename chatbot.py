@@ -34,13 +34,9 @@ def authenticate_gdrive():
         "universe_domain": st.secrets["gcp_service_account"]["universe_domain"]
     }
 
-    # if 'token' not in st.session_state:
     creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
     st.session_state['token'] = creds
-    # else:
-        # creds = Credentials.from_authorized_user_info(st.session_state['token'])
 
-    # create a Google Drive service
     service = build('drive', 'v3', credentials=creds)
     return service
 
@@ -51,7 +47,7 @@ def upload_or_append_file(service, file_name, new_data):
         existing_content = download_file_content(service, file_id)
         updated_content = append_to_file_content(existing_content, new_data)
         update_file_content(service, file_id, updated_content)
-        st.success(f"File '{file_name}' updated successfully.")
+
         return file_id
     else:
         file_metadata = {
@@ -60,7 +56,7 @@ def upload_or_append_file(service, file_name, new_data):
         }
         media = MediaFileUpload(file_name, mimetype='application/json')
         file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-        st.success(f"File '{file_name}' uploaded successfully with file ID: {file.get('id')}")
+
         return file.get('id')
 
 def download_file_content(service, file_id):
@@ -100,7 +96,6 @@ def share_file_with_user(service, file_id):
         fields='id'
     ).execute()
 
-    st.write(f"File ID {file_id} is shared with quynhd2001@gmail.com.")
 
 def app():
     img = Image.open("logo.png")
@@ -179,9 +174,6 @@ def app():
         if 'token' in st.session_state:
             service = authenticate_gdrive()
             file_id = upload_or_append_file(service, file_name, json_data)
-
-            file_url = f"https://drive.google.com/file/d/{file_id}/view"
-            st.write(f"View the file in Google Drive: [View File]({file_url})")
 
             share_file_with_user(service, file_id)
 
