@@ -35,7 +35,7 @@ def authenticate_gdrive():
 
     if 'token' not in st.session_state:
         creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
-        st.session_state['token'] = creds.to_json()
+        st.session_state['token'] = creds
     else:
         creds = Credentials.from_authorized_user_info(st.session_state['token'])
 
